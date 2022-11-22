@@ -2,24 +2,24 @@ from pubnub.callbacks import SubscribeCallback
 from pubnub.enums import PNStatusCategory, PNOperationType
 from pubnub.pnconfiguration import PNConfiguration
 from pubnub.pubnub import PubNub
+import sys
 
+
+name = sys.argv[1]
 pnconfig = PNConfiguration()
 
 pnconfig.subscribe_key = 'sub-c-e076c408-faa9-11e5-8916-0619f8945a4f'
 pnconfig.publish_key = 'pub-c-3d779a5c-675d-411b-b23d-9265381dce0a'
-pnconfig.user_id = "my_custom_user_id"
+pnconfig.user_id = name
 pubnub = PubNub(pnconfig)
 
 def my_publish_callback(envelope, status):
     # Check whether request successfully completed or not
     if not status.is_error():
-        print('success')
-        pass  # Message successfully published to specified channel.
+        pass
+        #print('   sending: success')
     else:
-        print('fail')
-        pass  # Handle message publish error. Check 'category' property to find out possible issue
-        # because of which request did fail.
-        # Request can be resent using: [status retry];
+        print('   sending: fail')
 
 class MySubscribeCallback(SubscribeCallback):
     def presence(self, pubnub, presence):
@@ -49,7 +49,7 @@ class MySubscribeCallback(SubscribeCallback):
 
 pubnub.add_listener(MySubscribeCallback())
 pubnub.subscribe().channels('my_channel').execute()
-print('aaa')
+
 while True:
     a = input()
-    pubnub.publish().channel('my_channel').message(a).pn_async(my_publish_callback)
+    pubnub.publish().channel('my_channel').message(name + ': ' + a).pn_async(my_publish_callback)
